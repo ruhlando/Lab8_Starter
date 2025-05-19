@@ -68,6 +68,19 @@ async function getRecipes() {
   // EXPOSE - START (All expose numbers start with A)
   // A1. TODO - Check local storage to see if there are any recipes.
   //            If there are recipes, return them.
+
+  let localStorageRecipes = localStorage.getItem('recipes');
+
+  if (localStorageRecipes) {
+    try {
+      const recipes = JSON.parse(localStorageRecipes);
+      return recipes;
+    } catch {
+      console.error("Error parsing recipes from localStorage:", error);
+      return [];
+    }
+  }
+
   /**************************/
   // The rest of this method will be concerned with requesting the recipes
   // from the network
@@ -100,6 +113,28 @@ async function getRecipes() {
   //            resolve() method.
   // A10. TODO - Log any errors from catch using console.error
   // A11. TODO - Pass any errors to the Promise's reject() function
+
+  let networkRecipes = [];
+
+  return new Promise(async (resolve, reject) => {
+    try {
+      for (const url of RECIPE_URLS) {
+        const response = await fetch(url);
+        const recipe = await response.json();
+        networkRecipes.push(recipe);
+      }
+
+    saveRecipesToStorage(networkRecipes);
+    resolve(networkRecipes);
+
+    } catch {
+      console.error("Error fetching recipes:", error);
+
+      reject(error);
+    };
+
+    });
+
 }
 
 /**
