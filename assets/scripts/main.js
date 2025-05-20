@@ -53,6 +53,28 @@ function initializeServiceWorker() {
   //            log that it was successful.
   // B5. TODO - In the event that the service worker registration fails, console
   //            log that it has failed.
+  const registerServiceWorker = async () => {
+      // B1:
+    if ('serviceWorker' in navigator) {
+      // B2: ("like wait till everythin (img, scripts, etc. is loaded befor registering the service worker")
+      window.addEventListener('load', () => {
+        // B3:
+        navigator.serviceWorker.register('./sw.js')
+          .then((registration) => {
+            // B4:
+            console.log('Service Worker registered! Scope:', registration.scope);
+          })
+          .catch((error) => {
+            // B5:
+            console.error('Service Worker registration failed:', error);
+          });
+      });
+    } else {
+      console.warn("Service Workers are not supported in this browser.");
+    }
+  };
+
+  registerServiceWorker();
   // STEPS B6 ONWARDS WILL BE IN /sw.js
 }
 
@@ -127,7 +149,7 @@ async function getRecipes() {
     saveRecipesToStorage(networkRecipes);
     resolve(networkRecipes);
 
-    } catch {
+    } catch (error) {
       console.error("Error fetching recipes:", error);
 
       reject(error);
